@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntrusionSentinel - Enterprise IDS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.0.1/dist/socket.io.min.js"></script>
+</head>
+<body>
+    <!-- Header with date/time and system status -->
+    <div class="system-header">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center py-2">
+                <div class="system-time">
+                    <i class="bi bi-clock"></i> <span id="current-time">00:00:00</span>
+                </div>
+                <div class="system-status">
+                    <span class="status-badge">
+                        <i class="bi bi-shield-check"></i> IDS Active
+                    </span>
+                    <span class="status-badge" id="pcap-status-badge">
+                        <i class="bi bi-file-earmark-binary"></i> PCAP Idle
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-shield-lock"></i>
+                INTRUSION<span class="text-primary">SENTINEL</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-section="overview">
+                            <i class="bi bi-speedometer2"></i> Overview
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="statistics">
+                            <i class="bi bi-graph-up"></i> Statistics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="alerts">
+                            <i class="bi bi-exclamation-triangle"></i> Alerts
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="analysis">
+                            <i class="bi bi-file-earmark-binary"></i> PCAP Analysis
+                        </a>
+                    </li>
+                </ul>
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="system-metrics me-2">
+                        <span class="metric-badge" title="CPU Usage">
+                            <i class="bi bi-cpu"></i> <span id="header-cpu">0%</span>
+                        </span>
+                        <span class="metric-badge" title="Memory Usage">
+                            <i class="bi bi-memory"></i> <span id="header-memory">0%</span>
+                        </span>
+                        <span class="metric-badge" title="Total Packets">
+                            <i class="bi bi-file-earmark-binary"></i> <span id="header-packets">0</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-3">
+        <!-- Overview Section -->
+        <div id="overview" class="dashboard-section">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <i class="bi bi-speedometer2 me-2"></i>Traffic Rate
+                        </div>
+                        <div class="card-body">
+                            <h2 class="traffic-count">0</h2>
+                            <p class="text-muted">Packets per second</p>
+                            <div class="traffic-trend" id="mini-traffic-trend"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header bg-danger text-white">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Alerts
+                        </div>
+                        <div class="card-body">
+                            <h2 class="alert-count">0</h2>
+                            <p class="text-muted">Total alerts</p>
+                            <div class="alert-trend" id="alert-trend-indicator">
+                                <span class="trend-badge">
+                                    <i class="bi bi-graph-up"></i> Live monitoring
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header bg-warning text-dark">
+                            <i class="bi bi-shield-x me-2"></i>Blocked IPs
+                        </div>
+                        <div class="card-body">
+                            <h2 class="blocked-count">0</h2>
+                            <p class="text-muted">IPs blocked</p>
+                            <div class="ip-trend">
+                                <span class="trend-badge">
+                                    <i class="bi bi-shield-check"></i> Auto-blocking enabled
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <i class="bi bi-check-circle me-2"></i>Status
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="status-indicator active"></div>
+                                <span class="status-text">SYSTEM ACTIVE</span>
+                            </div>
+                            <div class="mt-2" id="pcap-analysis-status">
+                                <div class="progress">
+                                    <div id="pcap-progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                                </div>
+                                <small class="text-muted" id="pcap-status-text">PCAP Analysis Ready</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <i class="bi bi-graph-up me-2"></i>Traffic Monitoring
+                                </div>
+                                <div class="card-actions">
+                                    <button class="btn btn-sm btn-outline-primary" id="traffic-refresh">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="trafficChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <i class="bi bi-pie-chart me-2"></i>Alert Distribution
+                                </div>
+                                <div class="card-actions">
+                                    <button class="btn btn-sm btn-outline-primary" id="alert-refresh">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="alertChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <i class="bi bi-exclamation-triangle me-2"></i>Latest Alerts
+                                </div>
+                                <div class="card-actions">
+                                    <span class="badge bg-primary" id="latest-alerts-count">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Type</th>
+                                            <th>Source IP</th>
+                                            <th>Description</th>
+                                            <th>Severity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="latest-alerts-table">
+                                        <!-- Latest 5 alerts will be shown here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div id="statistics" class="dashboard-section" style="display: none;">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-cpu me-2"></i>System Information
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush system-info">
+                                <li class="list-group-item">
+                                    <i class="bi bi-cpu me-2"></i>CPU Usage: 
+                                    <div class="progress ms-2 flex-grow-1">
+                                        <div id="cpu-progress" class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <span id="cpu-usage" class="ms-2">0%</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="bi bi-memory me-2"></i>Memory Usage: 
+                                    <div class="progress ms-2 flex-grow-1">
+                                        <div id="memory-progress" class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <span id="memory-usage" class="ms-2">0%</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="bi bi-hdd me-2"></i>Disk Usage: 
+                                    <div class="progress ms-2 flex-grow-1">
+                                        <div id="disk-progress" class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <span id="disk-usage" class="ms-2">0%</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="bi bi-clock me-2"></i>Uptime: <span id="uptime">0s</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="bi bi-file-earmark-binary me-2"></i>Packets Processed: <span id="packets-processed">0</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-shield-x me-2"></i>Blocked IPs
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>IP Address</th>
+                                            <th>Reason</th>
+                                            <th>Blocked At</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="blocked-ips-table">
+                                        <!-- Blocked IPs will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-bar-chart me-2"></i>Alert Types
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="alert alert-danger">
+                                        <h5><i class="bi bi-shield-exclamation me-2"></i>Port Scans</h5>
+                                        <h3 id="port-scan-count">0</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="alert alert-warning">
+                                        <h5><i class="bi bi-shield-exclamation me-2"></i>DoS Attacks</h5>
+                                        <h3 id="dos-count">0</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="alert alert-info">
+                                        <h5><i class="bi bi-shield-exclamation me-2"></i>Anomalies</h5>
+                                        <h3 id="anomaly-count">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts Section -->
+        <div id="alerts" class="dashboard-section" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-exclamation-triangle me-2"></i>All Alerts
+                        </div>
+                        <div class="d-flex">
+                            <div class="dropdown me-2">
+                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="alertFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Filter
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="alertFilterDropdown">
+                                    <li><a class="dropdown-item" href="#" data-filter="all">All Alerts</a></li>
+                                    <li><a class="dropdown-item" href="#" data-filter="critical">Critical Severity</a></li>
+                                    <li><a class="dropdown-item" href="#" data-filter="high">High Severity</a></li>
+                                    <li><a class="dropdown-item" href="#" data-filter="medium">Medium Severity</a></li>
+                                    <li><a class="dropdown-item" href="#" data-filter="port-scan">Port Scans</a></li>
+                                    <li><a class="dropdown-item" href="#" data-filter="dos">DoS Attacks</a></li>
+                                    <li><a class="dropdown-item" href="#" data-filter="anomaly">Anomalies</a></li>
+                                </ul>
+                            </div>
+                            <div class="form-inline">
+                                <input type="text" id="alert-search" class="form-control form-control-sm" placeholder="Search alerts...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Type</th>
+                                    <th>Source IP</th>
+                                    <th>Description</th>
+                                    <th>Severity</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alerts-table">
+                                <!-- Alerts will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PCAP Analysis Section -->
+        <div id="analysis" class="dashboard-section" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-file-earmark-binary me-2"></i>PCAP Analysis
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Current Analysis</h5>
+                        <div class="progress">
+                            <div id="pcap-analysis-progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                        </div>
+                        <p class="mt-2" id="pcap-analysis-info">No PCAP file currently being analyzed.</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Load PCAP File</h5>
+                        <form id="pcap-form" class="row g-3">
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="pcap-file-path" placeholder="Enter PCAP file path...">
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Analyze</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div id="pcap-results">
+                        <h5>Analysis Results</h5>
+                        <div class="alert alert-info" id="pcap-result-info">
+                            No analysis has been performed yet.
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h6 class="mb-3"><i class="bi bi-graph-up text-primary me-2"></i>Analysis Statistics</h6>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Packets Analyzed:</span>
+                                                <span id="pcap-packets-analyzed">0</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Alerts Generated:</span>
+                                                <span id="pcap-alerts-generated">0</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Critical Alerts:</span>
+                                                <span id="pcap-critical-alerts">0</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span>Analysis Duration:</span>
+                                                <span id="pcap-analysis-duration">-</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="mb-3"><i class="bi bi-shield-exclamation text-danger me-2"></i>Detection Summary</h6>
+                                            <div id="pcap-detection-summary">
+                                                No detection summary available.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer with version information -->
+    <footer class="footer mt-4">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center py-2">
+                <div class="footer-version">
+                    <small>IntrusionSentinel v2.0 | Enterprise Edition</small>
+                </div>
+                <div class="footer-links">
+                    <small>
+                        <a href="#" class="text-muted me-2">Documentation</a>
+                        <a href="#" class="text-muted me-2">Support</a>
+                        <a href="#" class="text-muted">About</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html> 

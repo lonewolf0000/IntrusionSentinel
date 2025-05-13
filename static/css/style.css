@@ -1,0 +1,736 @@
+/* Dark Theme - Enterprise-Level IDS */
+:root {
+    --primary: #0086f8;
+    --primary-light: #1e9bff;
+    --secondary: #282c34;
+    --danger: #e74c3c;
+    --warning: #f39c12;
+    --success: #2ecc71;
+    --info: #3498db;
+    --dark: #1a1d21;
+    --darker: #141618;
+    --gray: #6c757d;
+    --light-gray: #adb5bd;
+    --light: #f8f9fa;
+    --card-bg: #23272f;
+    --text: #e9ecef;
+    --text-muted: #cccccc;  /* Lighter muted text for better contrast */
+}
+
+/* General Styles */
+body {
+    background-color: var(--dark);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text);
+    transition: background-color 0.3s ease;
+}
+
+/* Scrollbar styles for a tech look */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--darker);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-light);
+}
+
+/* Navbar Styles */
+.navbar {
+    background: linear-gradient(to right, var(--darker), var(--secondary)) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--primary) !important;
+    text-transform: uppercase;
+}
+
+.navbar-brand i {
+    margin-right: 0.5rem;
+    color: var(--primary);
+}
+
+/* Card Styles - Dark theme */
+.card {
+    border: none;
+    background-color: var(--card-bg);
+    box-shadow: 0 4px 6px rgba(0,0,0,.1), 0 0 0 1px rgba(255,255,255,0.05);
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,.2), 0 0 0 1px rgba(255,255,255,0.07);
+}
+
+.card-header {
+    background: linear-gradient(to right, rgba(0,0,0,0.2), transparent);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+    color: var(--text);
+}
+
+.card-header.bg-primary {
+    background: linear-gradient(to right, var(--primary), #0065c9) !important;
+}
+
+.card-header.bg-danger {
+    background: linear-gradient(to right, var(--danger), #c0392b) !important;
+}
+
+.card-header.bg-warning {
+    background: linear-gradient(to right, var(--warning), #d35400) !important;
+}
+
+.card-header.bg-success {
+    background: linear-gradient(to right, var(--success), #27ae60) !important;
+}
+
+.card-body {
+    color: var(--text);
+}
+
+.card-title {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.card-title i {
+    margin-right: 8px;
+    color: var(--primary);
+}
+
+/* Status Indicator - Enhanced with glow */
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    position: relative;
+}
+
+.status-indicator.active {
+    background-color: var(--success);
+    box-shadow: 0 0 8px var(--success);
+    animation: pulse-glow 2s infinite;
+}
+
+.status-indicator.inactive {
+    background-color: var(--danger);
+    box-shadow: 0 0 8px var(--danger);
+}
+
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 5px var(--success); }
+    50% { box-shadow: 0 0 12px var(--success); }
+    100% { box-shadow: 0 0 5px var(--success); }
+}
+
+.status-text {
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+/* Alert Count - Enhanced with cyber styling */
+.alert-count {
+    color: var(--danger);
+    font-weight: bold;
+    transition: all 0.3s ease;
+    font-size: 2rem;
+    text-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+}
+
+.alert-count.flash {
+    font-size: 2.2rem;
+    color: #ff3b30;
+    text-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+    animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.critical-count {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+/* Traffic Count - Enhanced with cyber styling */
+.traffic-count {
+    color: var(--primary);
+    font-weight: bold;
+    transition: all 0.3s ease;
+    font-size: 2rem;
+    text-shadow: 0 0 10px rgba(0, 134, 248, 0.3);
+}
+
+.traffic-count.spike {
+    color: #ff5722;
+    text-shadow: 0 0 15px rgba(255, 87, 34, 0.5);
+    animation: traffic-pulse 1s ease-in-out;
+}
+
+@keyframes traffic-pulse {
+    0% { transform: scale(1); color: var(--primary); }
+    50% { transform: scale(1.3); color: #ff5722; }
+    100% { transform: scale(1); color: var(--primary); }
+}
+
+/* Blocked Count */
+.blocked-count {
+    color: var(--warning);
+    font-weight: bold;
+    font-size: 2rem;
+    text-shadow: 0 0 10px rgba(243, 156, 18, 0.3);
+}
+
+/* Table Styles - Dark theme */
+.table {
+    margin-bottom: 0;
+    color: var(--text);
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: var(--primary-light);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.table td {
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-top: none;
+    color: var(--text);
+}
+
+/* Hover effect for table rows */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 134, 248, 0.1);
+}
+
+/* Color coding for alert severity */
+.table-danger td {
+    background-color: rgba(231, 76, 60, 0.15);
+}
+
+.table-warning td {
+    background-color: rgba(243, 156, 18, 0.15);
+}
+
+/* Invert colors for alerts table */
+#alerts-table tr {
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+#alerts-table tr:hover {
+    border-left: 3px solid var(--primary);
+}
+
+/* System Info List */
+.system-info {
+    margin-bottom: 0;
+}
+
+.system-info li {
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    background-color: var(--card-bg);
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: var(--text);
+}
+
+.system-info i {
+    margin-right: 0.5rem;
+    width: 1.25rem;
+    text-align: center;
+    color: var(--primary);
+}
+
+/* Form control styling */
+.form-control {
+    background-color: var(--darker);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+}
+
+.form-control:focus {
+    background-color: var(--darker);
+    border-color: var(--primary);
+    color: var(--text);
+    box-shadow: 0 0 0 0.25rem rgba(0, 134, 248, 0.25);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+/* Chart containers - Enhanced for dark theme */
+.card-body canvas {
+    max-height: 300px;
+    min-height: 200px;
+}
+
+/* Progress bar styles - Cyber theme */
+.progress {
+    height: 0.75rem;
+    margin-bottom: 0.5rem;
+    background-color: var(--darker);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.progress-bar {
+    transition: width 0.5s ease;
+    background: linear-gradient(to right, var(--primary), var(--primary-light));
+    background-size: 200% 100%;
+    animation: gradient-shift 2s ease infinite;
+}
+
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.progress-bar-animated {
+    animation: progress-bar-stripes 1s linear infinite, gradient-shift 2s ease infinite;
+}
+
+/* Navigation styles */
+.nav-link {
+    color: rgba(255,255,255,.75);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: rgba(255,255,255,1);
+}
+
+.nav-link.active {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 3px;
+    background-color: var(--primary);
+    border-radius: 3px;
+}
+
+/* Dashboard sections */
+.dashboard-section {
+    padding: 1rem;
+    transition: opacity 0.3s ease;
+}
+
+/* Alert severity badges */
+.badge {
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 0.4em 0.6em;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.badge.bg-danger {
+    background-color: var(--danger) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--warning) !important;
+    color: #212529;
+}
+
+.badge.bg-info {
+    background-color: var(--info) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--gray) !important;
+}
+
+/* New Elements: Alert boxes */
+.alert {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.alert h5 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.alert h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.alert-danger {
+    background-color: rgba(231, 76, 60, 0.15);
+    color: #ff6b5b;
+    border-left: 4px solid #e74c3c;
+}
+
+.alert-warning {
+    background-color: rgba(243, 156, 18, 0.15);
+    color: #ffb74d;
+    border-left: 4px solid #f39c12;
+}
+
+.alert-info {
+    background-color: rgba(52, 152, 219, 0.15);
+    color: #64b5f6;
+    border-left: 4px solid #3498db;
+}
+
+.alert-success {
+    background-color: rgba(46, 204, 113, 0.15);
+    color: #66bb6a;
+    border-left: 4px solid #2ecc71;
+}
+
+/* Button styling */
+.btn-primary {
+    background: linear-gradient(to right, var(--primary), var(--primary-light));
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 134, 248, 0.2);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 8px rgba(0, 134, 248, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Traffic spike animation for enterprise dashboard */
+.traffic-spike {
+    color: #ff5722;
+    font-weight: bold;
+    position: relative;
+    animation: pulse-fade 2s infinite;
+}
+
+@keyframes pulse-fade {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Enterprise dashboard grid lines */
+.card-body {
+    position: relative;
+    z-index: 1;
+}
+
+.card-body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(circle, var(--primary) 1px, transparent 1px);
+    background-size: 25px 25px;
+    background-position: 0 0;
+    opacity: 0.03;
+    z-index: -1;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .table-responsive {
+        margin-bottom: 1rem;
+    }
+}
+
+/* System header styles */
+.system-header {
+    background-color: var(--darker);
+    color: var(--text-muted);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.9rem;
+}
+
+.system-time {
+    font-family: 'Consolas', monospace;
+    letter-spacing: 0.5px;
+    color: var(--text);
+}
+
+.system-status {
+    display: flex;
+    gap: 12px;
+}
+
+.status-badge {
+    padding: 2px 8px;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text);
+}
+
+.status-badge i {
+    color: var(--success);
+}
+
+#pcap-status-badge i {
+    color: var(--primary);
+}
+
+.pcap-active i {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* System metrics in header */
+.system-metrics {
+    display: flex;
+    gap: 10px;
+}
+
+.metric-badge {
+    background-color: rgba(0,0,0,0.2);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: var(--text);
+}
+
+.metric-badge i {
+    color: var(--primary);
+    margin-right: 5px;
+}
+
+/* Trend indicators */
+.trend-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: rgba(0,0,0,0.2);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--text);
+    margin-top: 5px;
+}
+
+.trend-badge i {
+    margin-right: 5px;
+    color: var(--success);
+}
+
+.traffic-trend {
+    margin-top: 10px;
+    height: 20px;
+}
+
+/* Footer styles */
+.footer {
+    background-color: var(--darker);
+    color: var(--text-muted);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.85rem;
+    margin-top: 3rem;
+}
+
+.footer a {
+    text-decoration: none;
+    color: var(--text-muted) !important;
+    transition: color 0.2s ease;
+}
+
+.footer a:hover {
+    color: var(--text) !important;
+}
+
+/* Card actions (buttons in card headers) */
+.card-actions .btn-outline-primary {
+    border-color: rgba(255,255,255,0.2);
+    color: var(--text);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.card-actions .btn-outline-primary:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* Dropdown menu styling */
+.dropdown-menu {
+    background-color: var(--card-bg);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.dropdown-item {
+    color: var(--text);
+}
+
+.dropdown-item:hover {
+    background-color: rgba(0, 134, 248, 0.1);
+    color: var(--primary);
+}
+
+/* Enhanced navbar styling */
+.navbar-nav .nav-link {
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.navbar-nav .nav-link i {
+    font-size: 1.1rem;
+}
+
+/* Animation for refresh buttons */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.btn-outline-primary:active i {
+    animation: spin 0.5s linear;
+}
+
+/* Enhanced system information list */
+.system-info li span {
+    color: var(--text);
+    margin-left: auto;
+}
+
+/* Enhanced list-group styling */
+.list-group-item {
+    background-color: var(--card-bg);
+    color: var(--text);
+    border-color: rgba(255,255,255,0.05);
+}
+
+.detection-summary .list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* PCAP progress active state */
+.progress-bar-animated.active {
+    animation: progress-bar-stripes 1s linear infinite, pulse-glow-progress 2s infinite, gradient-shift 2s ease infinite;
+}
+
+@keyframes pulse-glow-progress {
+    0% { box-shadow: 0 0 5px var(--primary); }
+    50% { box-shadow: 0 0 10px var(--primary); }
+    100% { box-shadow: 0 0 5px var(--primary); }
+}
+
+/* Enterprise-level glow effects */
+.glow-text {
+    text-shadow: 0 0 5px currentColor;
+}
+
+.alert-count, .traffic-count, .blocked-count {
+    text-shadow: 0 0 10px currentColor;
+}
+
+/* Enhanced hover effects for tables */
+.table-hover tbody tr {
+    transition: all 0.2s ease;
+}
+
+/* Statistics page specific styling */
+#statistics .card-header {
+    color: var(--text);
+    font-weight: 600;
+}
+
+#statistics .list-group-item {
+    color: var(--text);
+}
+
+#statistics .alert h5, 
+#statistics .alert h3 {
+    color: inherit;
+}
+
+/* Enhanced PCAP analysis styling */
+#analysis .progress {
+    height: 12px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    background-color: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+#analysis .progress-bar {
+    box-shadow: 0 0 10px rgba(0, 134, 248, 0.5);
+}
+
+/* Analysis result cards */
+#pcap-results .card {
+    border-left: 4px solid var(--primary);
+}
+
+/* Enterprise glow effect for active elements */
+.navbar-brand span,
+.nav-link.active,
+.status-indicator.active,
+#pcap-status-badge.pcap-active i {
+    text-shadow: 0 0 10px currentColor;
+}
+
+/* Overview card grid enhancement */
+#overview .card {
+    min-height: 150px;
+} 
